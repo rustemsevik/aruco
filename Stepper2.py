@@ -1,7 +1,7 @@
 import time
 
 # only test for uln2003
-class Stepper:
+class Stepper2:
     FULL_ROTATION = int(4075.7728395061727 / 8) # http://www.jangeox.be/2013/10/stepper-motor-28byj-48_25.html
 
     HALF_STEP = [
@@ -27,13 +27,13 @@ class Stepper:
         else:
         	self.mode = self.HALF_STEP
         self.pin1 = pin1
+        self.pin2 = pin2
+        self.pin3 = pin3
+        self.pin4 = pin4
         self.pin5 = pin5
-	self.pin2 = pin2
         self.pin6 = pin6
-	self.pin3 = pin3
         self.pin7 = pin7
-	self.pin4 = pin4
-   	self.pin8 = pin8
+        self.pin8 = pin8
         self.delay = delay  # Recommend 10+ for FULL_STEP, 1 is OK for HALF_STEP
         
         # Initialize all to 0
@@ -61,12 +61,12 @@ class Stepper:
         for x in range(count):
             for bit in self.mode[::direction]:
                 self.pin1(bit[0])
-                self.pin2(bit[1])
-                self.pin3(bit[2])
-                self.pin4(bit[3])
                 self.pin5(bit[0])
+                self.pin2(bit[1])
                 self.pin6(bit[1])
+                self.pin3(bit[2])
                 self.pin7(bit[2])
+                self.pin4(bit[3])
                 self.pin8(bit[3])
                 time.sleep_ms(self.delay)
         
@@ -81,6 +81,6 @@ class Stepper:
         self.pin4(0)
 
 def create(pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8, delay=2, mode='HALF_STEP'):
-	return Stepper(mode, pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8, delay)
+	return Stepper2(mode, pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8, delay)
 
 
