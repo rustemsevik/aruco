@@ -1,4 +1,4 @@
-import Stepper
+import Stepper2
 from machine import Pin
 
 '''**********************************
@@ -14,11 +14,11 @@ IN3 -->  4
 IN4 -->  0
 '''
 
-right_motor = Stepper.create(Pin(10,Pin.OUT),Pin(9,Pin.OUT),Pin(14,Pin.OUT),Pin(12,Pin.OUT),delay = 2)
 
-left_motor = Stepper.create(Pin(16,Pin.OUT),Pin(5,Pin.OUT),Pin(4,Pin.OUT),Pin(0,Pin.OUT),delay =2)
+motors = Stepper.create(Pin(16,Pin.OUT),Pin(5,Pin.OUT),Pin(4,Pin.OUT),Pin(0,Pin.OUT), Pin(10,Pin.OUT),Pin(9,Pin.OUT),Pin(14,Pin.OUT),Pin(12,Pin.OUT),delay = 2, mode='FULL_STEP')
 
-right_motor.angle(100)
-left_motor.angle(100)
+
+double(1000,1)
+
 
 
