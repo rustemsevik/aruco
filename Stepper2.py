@@ -26,10 +26,12 @@ class Stepper2:
         	self.mode = self.FULL_STEP
         else:
         	self.mode = self.HALF_STEP
+        #Motor 1 pins
         self.pin1 = pin1
         self.pin2 = pin2
         self.pin3 = pin3
         self.pin4 = pin4
+        #Motor 2 pins
         self.pin5 = pin5
         self.pin6 = pin6
         self.pin7 = pin7
@@ -60,14 +62,14 @@ class Stepper2:
             count = -count
         for x in range(count):
             for bit in self.mode[::direction]:
-                self.pin1(bit[0])
-                self.pin5(bit[0])
-                self.pin2(bit[1])
-                self.pin6(bit[1])
-                self.pin3(bit[2])
-                self.pin7(bit[2])
-                self.pin4(bit[3])
-                self.pin8(bit[3])
+                self.pin1(bit[0]) #motor1
+                self.pin5(bit[0]) #motor2
+                self.pin2(bit[1]) #motor1
+                self.pin6(bit[1]) #motor2
+                self.pin3(bit[2]) #motor1
+                self.pin7(bit[2]) #motor2
+                self.pin4(bit[3]) #motor1
+                self.pin8(bit[3]) #motor2
                 time.sleep_ms(self.delay)
         
         
@@ -75,10 +77,16 @@ class Stepper2:
     	self.step(int(self.FULL_ROTATION * r / 360), direction)
     def reset(self):
         # Reset to 0, no holding, these are geared, you can't move them
+        #Motor 1 pins
         self.pin1(0) 
         self.pin2(0) 
         self.pin3(0) 
         self.pin4(0)
+        #Motor 2 pins
+        self.pin5(0) 
+        self.pin6(0) 
+        self.pin7(0) 
+        self.pin8(0)
 
 def create(pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8, delay=2, mode='HALF_STEP'):
 	return Stepper2(mode, pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8, delay)
