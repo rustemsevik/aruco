@@ -24,13 +24,11 @@ def load_coefficients(path):
 mtx, dist = load_coefficients('calib.yml')
 
 def anglee(v1,v2):
-    print("V_1:",v1)
-    print("V_2:",v2)
-    angle1 = atan2(v1[1],v1[0])*180/np.pi
-    if angle1<0: angle1 = angle1 + 360
+    angle1 = atan2(v1[1], v1[0]) * 180 / np.pi
     angle2 = atan2(v2[1], v2[0]) * 180 / np.pi
-    if angle2 < 0: angle2 = angle2 + 360
-    return angle1-angle2
+    dif = angle2 - angle1
+    if dif < 0: dif += 360
+    return dif
 
 target = []
 def mousePoints(event,x,y,flags,params):
@@ -47,10 +45,9 @@ def create_rot_mat(rvec):
 
 def direction(rvec):
     R = create_rot_mat(rvec)
-    x_basis_of_marker0 = np.dot(R, np.array([1, 0, 0]), )
+    x_basis_of_marker0 = np.dot(R, np.array([0, 1, 0]), )
     x_new = np.delete(x_basis_of_marker0,2)
-    print("unit_direction", x_new)
-
+# kırmızı vectorun tersine gidiyor arac
     return x_new
 
 # Aruco detection
@@ -76,27 +73,29 @@ while True:
             center_y = (corners[0][0][0][1]+corners[0][0][1][1]+corners[0][0][2][1]+corners[0][0][3][1])/4
             center_l = [center_x,  center_y]
             center = np.array(center_l)
-            print("center:", center)
+            #print("center:", center)
             unit_dir = direction(rvec[0,:,:])
             if target:
                 target_vector = np.subtract(target, center)
                 target_vector_magnitude = np.sqrt(target_vector.dot(target_vector))
+                #print("target_vector_magnitude:",target_vector_magnitude )
+                if target_vector_magnitude > 100:
+                    #print("targetvector:", target_vector)
+                    unit_target_vector = target_vector/np.linalg.norm(target_vector)
+                    #print("Unit_target_vector:", unit_target_vector)
+                    angle = anglee(unit_target_vector, unit_dir)
+                    print("Angle", angle)
+                    if 10 < angle <= 180:
+                        client.publish("rot_commands", "Turn_Right")
+                        print("Turning Left...")
 
-                print("targetvector:", target_vector)
-                unit_target_vector = target_vector/np.linalg.norm(target_vector)
-                print("UUUnit_target_vector:", unit_target_vector)
-                angle = anglee(unit_target_vector, unit_dir)
-                if 10 < angle <= 180:
-                    print("Turning Right...")
-                    client.publish("rot_commands", "Turn_Right")
+                    elif 180 < angle < 350:
+                        print("Turning Right...")
+                        client.publish("rot_commands", "Turn_Left")
 
-                elif 180 < angle < 350:
-                    print("Turning Left...")
-                    client.publish("rot_commands", "Turn_Left")
-
-                else:
-                    print("Moving to the Target...")
-                    client.publish("rot_commands", "Move_Forward")
+                    else:
+                        print("Moving to the Target...")
+                        client.publish("rot_commands", "Move_Forward")
 
 
 
