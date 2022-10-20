@@ -6,7 +6,7 @@ from math import atan2
 import time
 
 client = mqtt.Client()
-#client.connect("192.168.0.196", 1883, 60)
+client.connect("192.168.0.196", 1883, 60)
 
 # kalibrasyon datalarını yüklüyorum
 def load_coefficients(path):
