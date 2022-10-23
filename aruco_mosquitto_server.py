@@ -1,3 +1,4 @@
+# This code publishes ids and positions of aruco markers.
 import cv2
 import numpy as np
 import cv2.aruco as aruco
@@ -48,7 +49,6 @@ while True:
             lst += lst1
             lst1.clear()
         client.publish(TOPIC, json.dumps(lst))
-        lst.clear()
 
     cv2.waitKey(1)
 
