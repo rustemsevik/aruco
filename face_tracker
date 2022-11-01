@@ -1,0 +1,69 @@
+import cv2
+import mediapipe as mp
+mp_face_detection = mp.solutions.face_detection
+mp_drawing = mp.solutions.drawing_utils
+import paho.mqtt.client as mqtt
+import time
+
+topic = "track"
+BROKER_ADDR = "192.168.36.4"
+
+client = mqtt.Client()
+client.connect(BROKER_ADDR, 1883, 60)
+
+def track(center_x, center_y):
+  if (center_x < 300 and center_y < 220):
+    client.publish(topic, "RU")
+  elif (center_x < 300 and center_y > 260):
+    client.publish(topic, "RD")
+  elif (center_x > 340 and center_y > 260):
+    client.publish(topic, "LD")
+  elif (center_x > 340 and center_y < 220):
+    client.publish(topic, "LU")
+  elif (center_x > 340):
+    client.publish(topic, "L")
+  elif (center_x < 300):
+    client.publish(topic, "R")
+  elif (center_y > 260):
+    client.publish(topic, "D")
+  elif (center_y < 220):
+    client.publish(topic, "U")
+
+# For webcam input:
+cap = cv2.VideoCapture(0)
+with mp_face_detection.FaceDetection(
+    model_selection=0, min_detection_confidence=0.5) as face_detection:
+  while cap.isOpened():
+    success, image = cap.read()
+    if not success:
+      print("Ignoring empty camera frame.")
+      # If loading a video, use 'break' instead of 'continue'.
+      continue
+
+    # To improve performance, optionally mark the image as not writeable to
+    # pass by reference.
+    image.flags.writeable = False
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    results = face_detection.process(image)
+
+    # Draw the face detection annotations on the image.
+    image.flags.writeable = True
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    if results.detections:
+      for detection in results.detections:
+        height, width, channels = image.shape  # height: 480, width:640
+        # Fetch coordinates of nose
+        box = detection.location_data.relative_bounding_box
+
+        center_x = int((box.xmin + box.width/2) * width)
+        center_y = int((box.ymin + box.height/2) * height)
+        coordinates = [center_x, center_y]
+        print(coordinates)
+        track(center_x, center_y)
+        time.sleep(0.1)
+        mp_drawing.draw_detection(image, detection)
+
+    cv2.imshow('MediaPipe Face Detection', image)
+    if cv2.waitKey(5) & 0xFF == 27:
+      break
+cap.release()
